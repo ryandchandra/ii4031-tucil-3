@@ -9,8 +9,6 @@ from Components import *
 from FileHandlingWindow import *
 from GenerateKeyWindow import *
 
-from ModifiedRC4Lib import *
-
 class GUI:
     def __init__(self,parent):
         #--- init ---#

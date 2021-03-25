@@ -1,6 +1,8 @@
 import tkinter as tk
 import tkinter.scrolledtext as st
 
+from GenerateKeyLib import *
+
 class GenerateKeyWindow:
     def __init__(self,parent):
         self.parent = parent
@@ -29,10 +31,20 @@ class GenerateKeyWindow:
         self.randomize_button.grid(row=4,column=0,columnspan=2,padx=2,pady=2)
         
     def GenerateKey(self):
-        # validasi
+        # Validation
+        p = int(self.p_entry.get("1.0",tk.END)[:-1])
+        q = int(self.q_entry.get("1.0",tk.END)[:-1])
+
+        p = ValidationPrime(p)
+        q = ValidationPrime(q)
+        self.p_entry.delete("1.0",tk.END)
+        self.p_entry.insert("1.0",p)
+        self.q_entry.delete("1.0",tk.END)
+        self.q_entry.insert("1.0",q)
+
         # generate key
         # save ke file
-        return "break"
+        #return "break"
         
     def RandomizeKey(self):
         # generate key
