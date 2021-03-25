@@ -21,7 +21,7 @@ class GUI:
         self.role = "Alice"
         
         #--- define grid ---#
-        self.parent.columnconfigure([0,1,2],weight=1)
+        self.parent.columnconfigure([0,1,2,3],weight=1)
         self.parent.rowconfigure([0,1,2,3],weight=1,minsize=100)
         
         #--- Alice frame ---#
@@ -48,19 +48,23 @@ class GUI:
         self.role_frame.button_list[0].bind("<Button-1>",lambda event,role="Alice": self.ChangeMode(event,role))
         self.role_frame.button_list[1].bind("<Button-1>",lambda event,role="Bob": self.ChangeMode(event,role))
         self.role_frame.button_list[0]["state"] = tk.DISABLED
-        self.role_frame.frame.grid(row=0,column=2);
+        self.role_frame.frame.grid(row=0,column=2,columnspan=2);
         
         #--- key frame ---#
-        key_button_list = ["Generate Key","Choose Key for Alice","Choose Key for Bob"]
+        key_button_list = ["Generate Key","Alice Public Key","Alice Private Key","Clear Alice Key","Bob Public Key","Bob Private Key","Clear Bob Key"]
         self.key_frame = ButtonListFrame(
             title = "Key Management",
             labels = key_button_list,
             width = 25
         )
         self.key_frame.button_list[0].bind("<Button-1>",self.GenerateKey)
-        self.key_frame.button_list[1].bind("<Button-1>",lambda event,subject="Alice": self.ChooseKeyFile(event,subject))
-        self.key_frame.button_list[2].bind("<Button-1>",lambda event,subject="Bob": self.ChooseKeyFile(event,subject))
-        self.key_frame.frame.grid(row=1,column=2)
+        self.key_frame.button_list[1].bind("<Button-1>",lambda event,type="public",subject="Alice": self.ChooseKeyFile(event,type,subject))
+        self.key_frame.button_list[2].bind("<Button-1>",lambda event,type="private",subject="Alice": self.ChooseKeyFile(event,type,subject))
+        self.key_frame.button_list[3].bind("<Button-1>",lambda event,subject="Alice": self.ClearKey(event,subject))
+        self.key_frame.button_list[4].bind("<Button-1>",lambda event,type="public",subject="Bob": self.ChooseKeyFile(event,type,subject))
+        self.key_frame.button_list[5].bind("<Button-1>",lambda event,type="private",subject="Bob": self.ChooseKeyFile(event,type,subject))
+        self.key_frame.button_list[6].bind("<Button-1>",lambda event,subject="Bob": self.ClearKey(event,subject))
+        self.key_frame.frame.grid(row=1,column=3,rowspan=3)
         
         #--- plaintext ---#
         self.plaintext = TextFrame(
@@ -83,24 +87,7 @@ class GUI:
         #self.decrypt_button.grid(row=2,column=1,padx=10,pady=10)
         self.decrypt_button.pack(padx=2,pady=2)
         
-        self.button_frame.grid(row=2,column=0)
-        
-        #--- block size frame ---#
-        self.block_size_frame = tk.Frame()
-        
-        self.block_size_label = tk.Label(master=self.block_size_frame,text="Block size (in bytes)")
-        self.block_size_label.pack()
-        
-        self.block_size_entry = tk.Entry(master=self.block_size_frame)
-        self.block_size_entry.pack()
-        
-        self.block_size_alert = tk.Label(master=self.block_size_frame,text="less than n in bytes")
-        self.block_size_alert.pack()
-        
-        self.block_size_info = tk.Label(master=self.block_size_frame,text="default : 1")
-        self.block_size_info.pack()
-        
-        self.block_size_frame.grid(row=2,column=1)
+        self.button_frame.grid(row=2,column=0,columnspan=2)
         
         #--- ciphertext ---#
         self.ciphertext = TextFrame(
@@ -122,7 +109,7 @@ class GUI:
         self.file_frame.button_list[2].bind("<Button-1>",lambda event,text="plaintext": self.SaveFileText(event,text))
         self.file_frame.button_list[3].bind("<Button-1>",lambda event,text="ciphertext": self.SaveFileText(event,text))
         self.file_frame.button_list[4].bind("<Button-1>",self.EncryptDecryptFileWindow)
-        self.file_frame.frame.grid(row=2,column=2,rowspan=2)  
+        self.file_frame.frame.grid(row=1,column=2,rowspan=3)  
         
     def ChangeMode(self,event,role):
         # Mengganti role dari Alice menjadi Bob atau sebaliknya
@@ -156,7 +143,6 @@ class GUI:
         
         # Take the plaintext and key from the field
         plaintext = self.plaintext.entry.get("1.0",tk.END)[:-1]
-        block_size = self.block_size_entry.get()
             
         # Check for validity
         if (len(plaintext)==0): # Empty plaintext
@@ -175,18 +161,18 @@ class GUI:
             if (e==-1 or n==-1):
                 self.AlertWindow("Please choose key first")
             else:
-                if (len(block_size)==0):
-                    block_size = 1
-                elif (int(block_size)<math.log(n,16)):
-                    self.AlertWindow("Block size is too big. Please choose block size less than n")
-                else:
-                    block_size = int(block_size)
-                    
-                ciphertext_hexstr = RSAEncrypt(plaintext_byteintarray,e,n,block_size)
+                start_time = time.time()
+                
+                ciphertext_hexstr = RSAEncrypt(plaintext_byteintarray,e,n,1)
+
+                end_time = time.time()
+                elapsed_time = end_time - start_time
                 
                 # Insert into ciphertext field
                 self.ciphertext.entry.delete("1.0",tk.END)
                 self.ciphertext.entry.insert("1.0",ciphertext_hexstr)
+                
+                self.AlertWindow("Process finished in " + str(elapsed_time) + "s")
             
     def Decrypt(self):
         # Event handler when decrypt button is pressed
@@ -210,12 +196,19 @@ class GUI:
                 self.AlertWindow("Please choose key for "+self.role)
             else:            
                 # Decrypt
+                start_time = time.time()
+                
                 plaintext_byteintarray = RSADecrypt(ciphertext,d,n)
                 plaintext = bytes(plaintext_byteintarray)
+                
+                end_time = time.time()
+                elapsed_time = end_time - start_time
                 
                 # Insert into plaintext field
                 self.plaintext.entry.delete("1.0",tk.END)
                 self.plaintext.entry.insert("1.0",plaintext)
+                
+                self.AlertWindow("Process finished in " + str(elapsed_time) + "s")
         
     def GenerateKey(self,event):
         # Membuka window baru untuk membuat key baru
@@ -224,65 +217,137 @@ class GUI:
         
         return "break"
         
-    def ChooseKeyFile(self,event,subject):
-        success = False
-    
-        public_filename = fd.askopenfilename(
-            initialdir = "/",
-            title = "Select " + subject + " public key file",
-            filetypes = [("Public key files (.pub)","*.pub")]
-        )
-        
-        if (public_filename!=""):
+    def ChooseKeyFile(self,event,type,subject):
+        if (type=="public"): # File public key
+            public_filename = fd.askopenfilename(
+                initialdir = "/",
+                title = "Select " + subject + " public key file",
+                filetypes = [("Public key files (.pub)","*.pub")]
+            )
+            
+            if (public_filename!=""):
+                # Baca file
+                public_file = open(public_filename,"r")
+                content_pub = public_file.read()
+                
+                # Ambil nilai e dan n
+                e_pub = int(content_pub[0:(content_pub.find(' ')+1)])
+                n_pub = int(content_pub[(content_pub.find(' ')+1):])
+                
+                public_file.close()
+
+                # Masukkan isi file
+                if (subject=="Alice"): # Untuk Alice
+                    if (self.Alice_n==-1 or self.Alice_d==-1): # Jika n Alice belum diset (key Alice belum diset), atau baru e dan n Alice yang diset, masukkan e dan n langsung
+                        self.Alice_e = e_pub
+                        self.Alice_n = n_pub
+                        if (self.role=="Alice"):
+                            self.Alice_frame.UpdateKey(e_pub,self.Alice_d,n_pub)
+                        elif (self.role=="Bob"):
+                            self.Alice_frame.UpdateKey(e_pub,"-1",n_pub)
+                    elif (self.Alice_d!=-1 and self.Alice_n==n_pub): # Jika d dan n Alice sudah diset dan sesuai dengan n baru
+                        if (math.gcd(e_pub,self.Alice_d)==1):
+                            self.Alice_e = e_pub
+                            self.Alice_n = n_pub
+                            if (self.role=="Alice"):
+                                self.Alice_frame.UpdateKey(e_pub,self.Alice_d,n_pub)
+                            elif (self.role=="Bob"):
+                                self.Alice_frame.UpdateKey(e_pub,"-1",n_pub)
+                        else:
+                            self.AlertWindow("Ada kesalahan pada key. Silakan cek lagi.")
+                    else:
+                        self.AlertWindow("Ada kesalahan pada key. Silakan cek lagi.")
+                elif (subject=="Bob"):
+                    if (self.Bob_n==-1 or self.Bob_d==-1):
+                        self.Bob_e = e_pub
+                        self.Bob_n = n_pub
+                        if (self.role=="Alice"):
+                            self.Bob_frame.UpdateKey(e_pub,"-1",n_pub)
+                        elif (self.role=="Bob"):
+                            self.Bob_frame.UpdateKey(e_pub,self.Bob_d,n_pub)
+                    elif (self.Bob_d!=-1):
+                        if (math.gcd(e_pub,self.Bob_d)==1):
+                            self.Bob_e = e_pub
+                            self.Bob_n = n_pub
+                            if (self.role=="Alice"):
+                                self.Bob_frame.UpdateKey(e_pub,"-1",n_pub)
+                            elif (self.role=="Bob"):
+                                self.Bob_frame.UpdateKey(e_pub,self.Bob_d,n_pub)
+                        else:
+                                self.AlertWindow("Ada kesalahan pada key. Silakan cek lagi.")
+                    else:
+                        self.AlertWindow("Ada kesalahan pada key. Silakan cek lagi.")
+                            
+        elif (type=="private"):
             private_filename = fd.askopenfilename(
-                initialdir = public_filename[0:(public_filename.rfind('/')+1)],
+                initialdir = "/",
                 title = "Select " + subject + " private key file",
                 filetypes = [("Private key files (.pri)","*.pri")]
             )
             
             if (private_filename!=""):
-                success = True 
-            
-        if (success):
-            public_file = open(public_filename,"r")
-            content_pub = public_file.read()
-            
-            e_pub = int(content_pub[0:(content_pub.find(' ')+1)])
-            n_pub = int(content_pub[(content_pub.find(' ')+1):])
-            
-            public_file.close()
-            
-            private_file = open(private_filename,"r")
-            content_pri = private_file.read()
-            
-            d_pri = int(content_pri[0:(content_pri.find(' ')+1)])
-            n_pri = int(content_pri[(content_pri.find(' '))+1:])
-            
-            private_file.close()
-            
-            if (n_pub==n_pri):
-                if (math.gcd(e_pub,d_pri)==1):
-                    if (subject=="Alice"):
-                        self.Alice_e = e_pub
+                private_file = open(private_filename,"r")
+                content_pri = private_file.read()
+                
+                d_pri = int(content_pri[0:(content_pri.find(' ')+1)])
+                n_pri = int(content_pri[(content_pri.find(' ')+1):])
+                
+                private_file.close()
+                
+                if (subject=="Alice"):
+                    if (self.Alice_n==-1 or self.Alice_e==-1): # Jika n Alice belum diset (key Alice belum diset), atau baru e dan n Alice yang diset, masukkan e dan n langsung
                         self.Alice_d = d_pri
-                        self.Alice_n = n_pub
+                        self.Alice_n = n_pri
                         if (self.role=="Alice"):
-                            self.Alice_frame.UpdateKey(e_pub,d_pri,n_pub)
+                            self.Alice_frame.UpdateKey(self.Alice_e,d_pri,n_pri)
                         elif (self.role=="Bob"):
-                            self.Alice_frame.UpdateKey(e_pub,"-",n_pub)
-                    elif (subject=="Bob"):
-                        self.Bob_e = e_pub
+                            self.Alice_frame.UpdateKey(self.Alice_e,"-1",n_pri)
+                    elif (self.Alice_e!=-1 and self.Alice_n==n_pri): # Jika d dan n Alice sudah diset dan sesuai dengan n baru
+                        if (math.gcd(d_pri,self.Alice_e)==1):
+                            self.Alice_d = d_pri
+                            self.Alice_n = n_pri
+                            if (self.role=="Alice"):
+                                self.Alice_frame.UpdateKey(self.Alice_e,d_pri,n_pri)
+                            elif (self.role=="Bob"):
+                                self.Alice_frame.UpdateKey(self.Alice_e,"-1",n_pri)
+                        else:
+                            self.AlertWindow("Ada kesalahan pada key. Silakan cek lagi.")
+                    else:
+                        self.AlertWindow("Ada kesalahan pada key. Silakan cek lagi.")
+                elif (subject=="Bob"):
+                    if (self.Bob_n==-1 or self.Bob_e==-1): # Jika n Bob belum diset (key Bob belum diset), atau baru e dan n Bob yang diset, masukkan e dan n langsung
                         self.Bob_d = d_pri
-                        self.Bob_n = n_pub
+                        self.Bob_n = n_pri
                         if (self.role=="Alice"):
-                            self.Bob_frame.UpdateKey(e_pub,"-",n_pub)
+                            self.Bob_frame.UpdateKey(self.Bob_e,"-1",n_pri)
                         elif (self.role=="Bob"):
-                            self.Bob_frame.UpdateKey(e_pub,d_pri,n_pub)
-                else:
-                    self.AlertWindow("Sepertinya file key salah. Coba dicek lagi.")
-            else:
-                self.AlertWindow("Sepertinya file key salah. Coba dicek lagi.")
+                            self.Bob_frame.UpdateKey(self.Bob_e,d_pri,n_pri)
+                    elif (self.Bob_e!=-1 and self.Bob_n==n_pri): # Jika d dan n Bob sudah diset dan sesuai dengan n baru
+                        if (math.gcd(d_pri,self.Bob_e)==1):
+                            self.Bob_d = d_pri
+                            self.Bob_n = n_pri
+                            if (self.role=="Alice"):
+                                self.Bob_frame.UpdateKey(self.Bob_e,"-1",n_pri)
+                            elif (self.role=="Bob"):
+                                self.Bob_frame.UpdateKey(self.Bob_e,d_pri,n_pri)
+                        else:
+                            self.AlertWindow("Ada kesalahan pada key. Silakan cek lagi.")
+                    else:
+                        self.AlertWindow("Ada kesalahan pada key. Silakan cek lagi.")
+                            
         return "break"
+        
+    def ClearKey(self,event,subject):
+        if (subject=="Alice"):
+            self.Alice_e = -1
+            self.Alice_d = -1
+            self.Alice_n = -1
+            self.Alice_frame.UpdateKey("-1","-1","-1")
+        elif (subject=="Bob"):
+            self.Bob_e = -1
+            self.Bob_d = -1
+            self.Bob_n = -1
+            self.Bob_frame.UpdateKey("-1","-1","-1")
         
     def OpenFileText(self,event,text):
         # Open file using open file dialog

@@ -116,6 +116,8 @@ def BlockCiphertext(ciphertext,n):
         for j in range(block_size):
             if ((i+j)<len(ciphertext_string)):
                 block += ciphertext_string[i+j]
+            else:
+                block += "0"
         
         i = i + block_size
         ciphertext_block.append(int(block,16))

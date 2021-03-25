@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.scrolledtext as st
 import tkinter.filedialog as fd
 import math
+import time
 
 from RSALib import *
 
@@ -40,10 +41,11 @@ class FileHandlingWindow:
         
         # Button list
         tk.Button(master=self.window,text="Choose File",width=20,command=self.ChooseFile).grid(row=6,column=0,columnspan=2,pady=2)
-        tk.Button(master=self.window,text="Choose Key",width=20,command=self.ChooseKey).grid(row=7,column=0,columnspan=2,pady=2)
-        tk.Button(master=self.window,text="Encrypt and Save",width=20,command=self.SaveEncryptedFile).grid(row=8,column=0,columnspan=2,pady=2)
-        tk.Button(master=self.window,text="Decrypt and Save",width=20,command=self.SaveDecryptedFile).grid(row=9,column=0,columnspan=2,pady=2)
-        tk.Button(master=self.window,text="Unselect File",width=20,command=self.UnselectFile).grid(row=10,column=0,columnspan=2,pady=2)
+        tk.Button(master=self.window,text="Choose Public Key",width=20,command=self.ChoosePublicKey).grid(row=7,column=0,columnspan=2,pady=2)
+        tk.Button(master=self.window,text="Choose Private Key",width=20,command=self.ChoosePrivateKey).grid(row=8,column=0,columnspan=2,pady=2)
+        tk.Button(master=self.window,text="Encrypt and Save",width=20,command=self.SaveEncryptedFile).grid(row=9,column=0,columnspan=2,pady=2)
+        tk.Button(master=self.window,text="Decrypt and Save",width=20,command=self.SaveDecryptedFile).grid(row=10,column=0,columnspan=2,pady=2)
+        tk.Button(master=self.window,text="Unselect File",width=20,command=self.UnselectFile).grid(row=11,column=0,columnspan=2,pady=2)
         
     def ChooseFile(self):
         # Take filename
@@ -57,9 +59,7 @@ class FileHandlingWindow:
             self.file_label["text"] = "File : " + filename
             self.file = filename
 
-    def ChooseKey(self):
-        success = False
-    
+    def ChoosePublicKey(self):
         public_filename = fd.askopenfilename(
             initialdir = "/",
             title = "Select public key file",
@@ -67,16 +67,6 @@ class FileHandlingWindow:
         )
         
         if (public_filename!=""):
-            private_filename = fd.askopenfilename(
-                initialdir = public_filename[0:(public_filename.rfind('/')+1)],
-                title = "Select private key file",
-                filetypes = [("Private key files (.pri)","*.pri")]
-            )
-            
-            if (private_filename!=""):
-                success = True 
-            
-        if (success):
             public_file = open(public_filename,"r")
             content_pub = public_file.read()
             
@@ -85,6 +75,25 @@ class FileHandlingWindow:
             
             public_file.close()
             
+            self.e_key_entry.delete("1.0",tk.END)
+            self.e_key_entry.insert("1.0",e_pub)
+            self.d_key_entry.delete("1.0",tk.END)
+            self.n_key_entry.delete("1.0",tk.END)
+            self.n_key_entry.insert("1.0",n_pub)
+            
+            self.key_label["text"] = "Key : " + "Loaded"
+            self.key = "Loaded"
+            
+        return "break"
+        
+    def ChoosePrivateKey(self):
+        private_filename = fd.askopenfilename(
+            initialdir = "/",
+            title = "Select private key file",
+            filetypes = [("Private key files (.pri)","*.pri")]
+        )
+        
+        if (private_filename!=""):
             private_file = open(private_filename,"r")
             content_pri = private_file.read()
             
@@ -93,49 +102,47 @@ class FileHandlingWindow:
             
             private_file.close()
             
-            if (n_pub==n_pri):
-                if (math.gcd(e_pub,d_pri)==1):
-                    self.e_key_entry.delete("1.0",tk.END)
-                    self.e_key_entry.insert("1.0",e_pub)
-                    self.d_key_entry.delete("1.0",tk.END)
-                    self.d_key_entry.insert("1.0",d_pri)
-                    self.n_key_entry.delete("1.0",tk.END)
-                    self.n_key_entry.insert("1.0",n_pub)
-                    self.key_label["text"] = "Key : " + "Loaded"
-                    self.key = "Loaded"
-                else:
-                    self.AlertWindow("Sepertinya file key salah. Coba dicek lagi.")
-            else:
-                self.AlertWindow("Sepertinya file key salah. Coba dicek lagi.")
-        return "break"
+            self.e_key_entry.delete("1.0",tk.END)
+            self.d_key_entry.delete("1.0",tk.END)
+            self.d_key_entry.insert("1.0",d_pri)
+            self.n_key_entry.delete("1.0",tk.END)
+            self.n_key_entry.insert("1.0",n_pri)
+            
+            self.key_label["text"] = "Key : " + "Loaded"
+            self.key = "Loaded"
         
+        return "break"
                 
     def SaveEncryptedFile(self):
         # buka file di self.file 
         if (self.file==""):
             self.AlertWindow("Please choose a file")
-        elif (self.key==""):
-            self.AlertWindow("Please choose a key file")
         else:
             #encrypt
             e = self.e_key_entry.get("1.0",tk.END)[:-1]
-            d = self.d_key_entry.get("1.0",tk.END)[:-1]
+            #d = self.d_key_entry.get("1.0",tk.END)[:-1]
             n = self.n_key_entry.get("1.0",tk.END)[:-1]
-            e = int(e)
-            d = int(d)
-            n = int(n)
             
-            if (self.key==""):
-                self.AlertWindow("Please insert key")
-            else:
+            if (len(e)==0 or len(n)==0):
+                self.AlertWindow("Please insert e and n")
+            else: 
+                e = int(e)
+                #d = int(d)
+                n = int(n)
+                
+                start_time = time.time()
+                
                 # baca file per byte lalu simpan menjadi array of integer (byte)
                 plaintext_byteintarray = OpenFileAsByteIntArray(self.file)
-                
+                 
                 # encrypt
                 size = 1
                 ciphertext_hexstr = RSAEncrypt(plaintext_byteintarray,e,n,size)
                 ciphertext_byteintarray = HexStringToByteIntArray(ciphertext_hexstr)
 
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+                
                 # save
                 filename = fd.asksaveasfilename(
                     initialdir = "/",
@@ -146,37 +153,45 @@ class FileHandlingWindow:
                 if (filename!=""):
                     # save hasil enkripsi per byte
                     output_file = open(filename, "wb")
-                    
+                        
                     for byteint in ciphertext_byteintarray:
                         output_file.write(byteint.to_bytes(1,byteorder='little'))
-                    
+                     
                     output_file.close()
+                    
+                    self.AlertWindow("Process finished in "+str(elapsed_time)+" s and "+str(len(ciphertext_byteintarray))+" bytes")
         
     def SaveDecryptedFile(self):
         # buka file di self.file 
         if (self.file==""):
             self.AlertWindow("Please choose a file")
-        elif (self.key==""):
-            self.AlertWindow("Please choose a key file")
         else:
             # decrypt
-            e = self.e_key_entry.get("1.0",tk.END)[:-1]
+            #e = self.e_key_entry.get("1.0",tk.END)[:-1]
             d = self.d_key_entry.get("1.0",tk.END)[:-1]
             n = self.n_key_entry.get("1.0",tk.END)[:-1]
-            e = int(e)
-            d = int(d)
-            n = int(n)
 
-            if (self.key==""):
-                self.AlertWindow("Please insert key")
-            else:
+            if (len(d)==0 or len(n)==0):
+                self.AlertWindow("Please insert d and n")
+            else:            
+                #e = int(e)
+                d = int(d)
+                n = int(n)
+            
+                start_time = time.time()
+            
                 # baca file per byte lalu simpan menjadi array of integer (byte)
                 ciphertext_byteintarray = OpenFileAsByteIntArray(self.file)
                 ciphertext_hexstr = ByteIntArrayToHexString(ciphertext_byteintarray)
                 
                 # decrypt
                 plaintext_byteintarray = RSADecrypt(ciphertext_hexstr,d,n)
-
+                
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+                
+                print(plaintext_byteintarray)
+    
                 # save
                 filename = fd.asksaveasfilename(
                     initialdir = "/",
@@ -192,6 +207,8 @@ class FileHandlingWindow:
                         output_file.write(byteint.to_bytes(1,byteorder='little'))
                     
                     output_file.close()
+                    
+                    self.AlertWindow("Process finished in "+str(elapsed_time)+" s and "+str(len(plaintext_byteintarray))+" bytes")
     
     def UnselectFile(self):
         self.file = ""
