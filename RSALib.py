@@ -50,7 +50,7 @@ def BlockByteIntArray(byteint_array,size):
                     else:
                         block += str(byteint_array[i+j])
                 else:
-                    block += str(ord('/0'))
+                    block += str(ord('\0'))
                 
             i = i + size
             blocked_byteintarray.append(int(block))

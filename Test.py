@@ -2,40 +2,12 @@
 
 from GenerateKeyLib import *
 from random import randint
+import tkinter.filedialog as fd
+from RSALib import *
 
-p = 36
-q = 64
-
-p = ValidationPrime(p)
-q = ValidationPrime(q)
-
-print (p)
-print (q)
-
-
-n = p*q
-toitent_euler = (p-1)*(q-1)
-e = toitent_euler
-while (e >= toitent_euler):
-    e = randint (2, toitent_euler)
-    e = ValidationPrime(e)
-
-print (toitent_euler)
-print (e)
-
-found = 0
-k = 1
-while not(found):
-    d = (1+k*toitent_euler)/e
-    if ((e*int(d))%toitent_euler == 1):
-        found = 1    
-    k = k+1
-d = int(d)
-print(d)
-
-arr = [e, d, n]
-print (arr)
-A = arr[0]
+A = StringToByteIntArray('Aku Kamu Kita')
+B = BlockByteIntArray(A,2)
 print (A)
-B = [p, q, arr[0], arr[1], arr[2]]
 print (B)
+
+    
