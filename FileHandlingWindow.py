@@ -134,12 +134,9 @@ class FileHandlingWindow:
                 
                 # baca file per byte lalu simpan menjadi array of integer (byte)
                 plaintext_byteintarray = OpenFileAsByteIntArray(self.file)
-<<<<<<< HEAD
-                 
-=======
+
                 #print (plaintext_byteintarray)
                 
->>>>>>> 781dd0255c464199fc2ef62b5c86944505e03c35
                 # encrypt
                 size = 1
                 ciphertext_hexstr = RSAEncrypt(plaintext_byteintarray,e,n,size)
@@ -195,17 +192,13 @@ class FileHandlingWindow:
                 
                 # decrypt
                 plaintext_byteintarray = RSADecrypt(ciphertext_hexstr,d,n)
-<<<<<<< HEAD
                 
                 end_time = time.time()
                 elapsed_time = end_time - start_time
                 
                 print(plaintext_byteintarray)
-    
-=======
                 #print(plaintext_byteintarray)
 
->>>>>>> 781dd0255c464199fc2ef62b5c86944505e03c35
                 # save
                 filename = fd.asksaveasfilename(
                     initialdir = "/",
