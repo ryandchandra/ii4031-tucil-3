@@ -69,13 +69,14 @@ def RandomKey(size):
     # Input :  -
     # Output :  array (p, q) 
     
-    max = pow(2,size)-1
+    max = 2**size-1
+    min = 2**(size/2)-1
 
-    p = randint (2, max)
+    p = randint (min, max)
     p = ValidationPrime(p)
     q = p 
     while (q == p):
-        q = randint (2, max)
+        q = randint (min, max)
         q = ValidationPrime(q)
     
     return [p,q]

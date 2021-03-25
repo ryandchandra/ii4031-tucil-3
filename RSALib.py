@@ -10,6 +10,23 @@ def StringToByteIntArray(string):
         byteint_array.append(ord(char))
         
     return byteint_array
+    
+def HexStringToByteIntArray(hexstring):
+    # Mengubah string heksadesimal menjadi array of integer(byte)
+    # Input : string hexadecimal
+    # Output : array of integer (byte) dari string
+    byteint_array = []
+    
+    i = 0
+    while (i<len(hexstring)):
+        if (i==len(hexstring)-1):
+            byteint_array.append(int(hexstring[i]+"0",16))
+            i = i + 1
+        else:
+            byteint_array.append(int(hexstring[i:i+2],16))
+            i = i + 2
+        
+    return byteint_array
 
 def OpenFileAsByteIntArray(filename):
     # Membuka file dengan nama filename per byte lalu menyimpannya menjadi array of integer (byte)

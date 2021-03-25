@@ -135,7 +135,7 @@ class GenerateKeyWindow:
         alert_window = tk.Toplevel(self.parent)
         alert_window.title("Alert")
         
-        tk.Label(master=alert_window,text=text).pack(padx=120,pady=20)
+        tk.Label(master=alert_window,text=text,wraplength=200).pack(padx=120,pady=20)
         tk.Button(master=alert_window,text="OK",width=10,command=lambda:alert_window.destroy()).pack(pady=10)
         
         alert_window.grab_set()
