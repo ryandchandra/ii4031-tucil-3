@@ -3,6 +3,8 @@ import tkinter.scrolledtext as st
 import tkinter.filedialog as fd
 import math
 
+from RSALib import *
+
 class FileHandlingWindow:
     def __init__(self,parent):
         self.parent = parent
@@ -21,12 +23,20 @@ class FileHandlingWindow:
         self.key_label = tk.Label(master=self.window,text="Key : " + self.key,width=50)
         self.key_label.grid(row=1,column=0,columnspan=2,sticky="we",padx=120,pady=2)
 
-        self.e_key_label = tk.Label(master=self.window,text="e: " + self.e_key,width=50)
-        self.e_key_label.grid(row=3,column=0,columnspan=2,sticky="we",padx=120,pady=2)
-        self.d_key_label = tk.Label(master=self.window,text="d: -")
-        self.d_key_label.grid(row=4,column=0,columnspan=2,sticky="we",padx=120,pady=2)
-        self.n_key_label = tk.Label(master=self.window,text="n: -")
-        self.n_key_label.grid(row=5,column=0,columnspan=2,sticky="we",padx=120,pady=2)
+        self.e_key_label = tk.Label(master=self.window,text="e: ")
+        self.e_key_label.grid(row=3,column=0,columnspan=2,padx=120,pady=2)
+        self.e_key_entry = tk.Text(master=self.window,width=10,height=1)
+        self.e_key_entry.grid(row=3,column=1,padx=120,pady=2)
+
+        self.d_key_label = tk.Label(master=self.window,text="d: ")
+        self.d_key_label.grid(row=4,column=0,columnspan=2,padx=120,pady=2)
+        self.d_key_entry = tk.Text(master=self.window,width=10,height=1)
+        self.d_key_entry.grid(row=4,column=1,padx=120,pady=2)
+
+        self.n_key_label = tk.Label(master=self.window,text="n: ")
+        self.n_key_label.grid(row=5,column=0,columnspan=2,padx=120,pady=2)
+        self.n_key_entry = tk.Text(master=self.window,width=10,height=1)
+        self.n_key_entry.grid(row=5,column=1,padx=120,pady=2)
         
         # Button list
         tk.Button(master=self.window,text="Choose File",width=20,command=self.ChooseFile).grid(row=6,column=0,columnspan=2,pady=2)
@@ -85,11 +95,14 @@ class FileHandlingWindow:
             
             if (n_pub==n_pri):
                 if (math.gcd(e_pub,d_pri)==1):
-                    self.e_key_label["text"] = "e : " + str(e_pub)
-                    self.d_key_label["text"] = "d : " + str(d_pri)
-                    self.n_key_label["text"] = "n : " + str(n_pub)
-                    #self.d_key["text"] = "d: " + str(d_pri)
-                    #self.n_key["text"] = "n: " + str(n_pub)
+                    self.e_key_entry.delete("1.0",tk.END)
+                    self.e_key_entry.insert("1.0",e_pub)
+                    self.d_key_entry.delete("1.0",tk.END)
+                    self.d_key_entry.insert("1.0",d_pri)
+                    self.n_key_entry.delete("1.0",tk.END)
+                    self.n_key_entry.insert("1.0",n_pub)
+                    self.key_label["text"] = "Key : " + "Loaded"
+                    self.key = "Loaded"
                 else:
                     self.AlertWindow("Sepertinya file key salah. Coba dicek lagi.")
             else:
@@ -101,19 +114,23 @@ class FileHandlingWindow:
         # buka file di self.file 
         if (self.file==""):
             self.AlertWindow("Please choose a file")
+        elif (self.key==""):
+            self.AlertWindow("Please choose a key file")
         else:
             #encrypt
-            key = self.key_entry.get()
-            if (len(key)==0):
+            e = self.e_key_entry.get("1.0",tk.END)[:-1]
+            d = self.d_key_entry.get("1.0",tk.END)[:-1]
+            n = self.n_key_entry.get("1.0",tk.END)[:-1]
+            
+            if (self.key==""):
                 self.AlertWindow("Please insert key")
             else:
                 # baca file per byte lalu simpan menjadi array of integer (byte)
                 plaintext_byteintarray = OpenFileAsByteIntArray(self.file)
                 
-                key_byteintarray = StringToByteIntArray(key)
-                
                 # encrypt
-                ciphertext_byteintarray = ModifiedRC4Encrypt(plaintext_byteintarray,key)
+                size = 1
+                ciphertext_hexstr = RSAEncrypt(plaintext_byteintarray,e,n,size)
                 
                 # save
                 filename = fd.asksaveasfilename(
@@ -135,10 +152,15 @@ class FileHandlingWindow:
         # buka file di self.file 
         if (self.file==""):
             self.AlertWindow("Please choose a file")
+        elif (self.key==""):
+            self.AlertWindow("Please choose a key file")
         else:
             # decrypt
-            key = self.key_entry.get()
-            if (len(key)==0):
+            e = self.e_key_entry.get("1.0",tk.END)[:-1]
+            d = self.d_key_entry.get("1.0",tk.END)[:-1]
+            n = self.n_key_entry.get("1.0",tk.END)[:-1]
+
+            if (self.key==""):
                 self.AlertWindow("Please insert key")
             else:
                 # baca file per byte lalu simpan menjadi array of integer (byte)
