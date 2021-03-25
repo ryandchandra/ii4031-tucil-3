@@ -13,11 +13,16 @@ print (B)
 C = HexStringToByteIntArray(B)
 print (C)
 
+C = [84, 4, 80, 84, 6, 87, 0, 2, 224, 13, 230, 215, 57, 198, 215, 0, 0, 1, 0, 16, 0, 0, 0, 1]
+print(C)
 D = ""
 for byte in C:
     cipher_hex = str(hex(byte))[2:].upper()
+    if (len(cipher_hex)==1):
+        cipher_hex = '0'+cipher_hex
     D = D + cipher_hex
+    print (cipher_hex)
 print(D)
 
-E = RSADecrypt(D,183,253) 
+E = RSADecrypt(D,209,2183) 
 print(E)
