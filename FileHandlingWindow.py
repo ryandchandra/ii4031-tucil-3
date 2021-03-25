@@ -1,5 +1,7 @@
 import tkinter as tk
 import tkinter.scrolledtext as st
+import tkinter.filedialog as fd
+import math
 
 class FileHandlingWindow:
     def __init__(self,parent):
@@ -8,16 +10,30 @@ class FileHandlingWindow:
         self.window.title("Encrypt/Decrypt File")
         
         self.file = ""
+        self.key = ""
+        self.e_key = ""
+        self.d_key = ""
+        self.n_key = ""
 
         # Define elements
         self.file_label = tk.Label(master=self.window,text="File : " + self.file,width=50)
         self.file_label.grid(row=0,column=0,columnspan=2,sticky="we",padx=120,pady=2)
+        self.key_label = tk.Label(master=self.window,text="Key : " + self.key,width=50)
+        self.key_label.grid(row=1,column=0,columnspan=2,sticky="we",padx=120,pady=2)
+
+        self.e_key_label = tk.Label(master=self.window,text="e: " + self.e_key,width=50)
+        self.e_key_label.grid(row=3,column=0,columnspan=2,sticky="we",padx=120,pady=2)
+        self.d_key_label = tk.Label(master=self.window,text="d: -")
+        self.d_key_label.grid(row=4,column=0,columnspan=2,sticky="we",padx=120,pady=2)
+        self.n_key_label = tk.Label(master=self.window,text="n: -")
+        self.n_key_label.grid(row=5,column=0,columnspan=2,sticky="we",padx=120,pady=2)
         
         # Button list
-        tk.Button(master=self.window,text="Choose File",width=20,command=self.ChooseFile).grid(row=3,column=0,columnspan=2,pady=2)
-        tk.Button(master=self.window,text="Encrypt and Save",width=20,command=self.SaveEncryptedFile).grid(row=4,column=0,columnspan=2,pady=2)
-        tk.Button(master=self.window,text="Decrypt and Save",width=20,command=self.SaveDecryptedFile).grid(row=5,column=0,columnspan=2,pady=2)
-        tk.Button(master=self.window,text="Unselect File",width=20,command=self.UnselectFile).grid(row=6,column=0,columnspan=2,pady=2)
+        tk.Button(master=self.window,text="Choose File",width=20,command=self.ChooseFile).grid(row=6,column=0,columnspan=2,pady=2)
+        tk.Button(master=self.window,text="Choose Key",width=20,command=self.ChooseKey).grid(row=7,column=0,columnspan=2,pady=2)
+        tk.Button(master=self.window,text="Encrypt and Save",width=20,command=self.SaveEncryptedFile).grid(row=8,column=0,columnspan=2,pady=2)
+        tk.Button(master=self.window,text="Decrypt and Save",width=20,command=self.SaveDecryptedFile).grid(row=9,column=0,columnspan=2,pady=2)
+        tk.Button(master=self.window,text="Unselect File",width=20,command=self.UnselectFile).grid(row=10,column=0,columnspan=2,pady=2)
         
     def ChooseFile(self):
         # Take filename
@@ -30,6 +46,56 @@ class FileHandlingWindow:
         if (filename!=""):
             self.file_label["text"] = "File : " + filename
             self.file = filename
+
+    def ChooseKey(self):
+        success = False
+    
+        public_filename = fd.askopenfilename(
+            initialdir = "/",
+            title = "Select public key file",
+            filetypes = [("Public key files (.pub)","*.pub")]
+        )
+        
+        if (public_filename!=""):
+            private_filename = fd.askopenfilename(
+                initialdir = public_filename[0:(public_filename.rfind('/')+1)],
+                title = "Select private key file",
+                filetypes = [("Private key files (.pri)","*.pri")]
+            )
+            
+            if (private_filename!=""):
+                success = True 
+            
+        if (success):
+            public_file = open(public_filename,"r")
+            content_pub = public_file.read()
+            
+            e_pub = int(content_pub[0:(content_pub.find(' ')+1)])
+            n_pub = int(content_pub[(content_pub.find(' ')+1):])
+            
+            public_file.close()
+            
+            private_file = open(private_filename,"r")
+            content_pri = private_file.read()
+            
+            d_pri = int(content_pri[0:(content_pri.find(' ')+1)])
+            n_pri = int(content_pri[(content_pri.find(' '))+1:])
+            
+            private_file.close()
+            
+            if (n_pub==n_pri):
+                if (math.gcd(e_pub,d_pri)==1):
+                    self.e_key_label["text"] = "e : " + str(e_pub)
+                    self.d_key_label["text"] = "d : " + str(d_pri)
+                    self.n_key_label["text"] = "n : " + str(n_pub)
+                    #self.d_key["text"] = "d: " + str(d_pri)
+                    #self.n_key["text"] = "n: " + str(n_pub)
+                else:
+                    self.AlertWindow("Sepertinya file key salah. Coba dicek lagi.")
+            else:
+                self.AlertWindow("Sepertinya file key salah. Coba dicek lagi.")
+        return "break"
+        
                 
     def SaveEncryptedFile(self):
         # buka file di self.file 

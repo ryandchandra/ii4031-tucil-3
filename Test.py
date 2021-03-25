@@ -10,4 +10,10 @@ B = BlockByteIntArray(A,2)
 print (A)
 print (B)
 
+C = RSAEncrypt(A, 107, 253, 2)
+print (C)
+
+D = BlockCiphertext(C,253)
+print (D)
+
     
