@@ -130,11 +130,14 @@ class FileHandlingWindow:
             else:
                 # baca file per byte lalu simpan menjadi array of integer (byte)
                 plaintext_byteintarray = OpenFileAsByteIntArray(self.file)
+                #print (plaintext_byteintarray)
                 
                 # encrypt
                 size = 1
                 ciphertext_hexstr = RSAEncrypt(plaintext_byteintarray,e,n,size)
                 ciphertext_byteintarray = HexStringToByteIntArray(ciphertext_hexstr)
+                #print(ciphertext_hexstr)
+                #print(ciphertext_byteintarray)
 
                 # save
                 filename = fd.asksaveasfilename(
@@ -173,9 +176,12 @@ class FileHandlingWindow:
                 # baca file per byte lalu simpan menjadi array of integer (byte)
                 ciphertext_byteintarray = OpenFileAsByteIntArray(self.file)
                 ciphertext_hexstr = ByteIntArrayToHexString(ciphertext_byteintarray)
+                #print(ciphertext_hexstr)
+                #print(ciphertext_byteintarray)
                 
                 # decrypt
                 plaintext_byteintarray = RSADecrypt(ciphertext_hexstr,d,n)
+                #print(plaintext_byteintarray)
 
                 # save
                 filename = fd.asksaveasfilename(

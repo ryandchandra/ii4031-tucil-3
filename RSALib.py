@@ -36,6 +36,8 @@ def ByteIntArrayToHexString(byteint_array):
     hexstring = ""
     for byte in byteint_array:
         cipher_hex = str(hex(byte))[2:].upper()
+        if (len(cipher_hex)==1):
+            cipher_hex = '0'+cipher_hex
         hexstring = hexstring + cipher_hex
 
     return hexstring
