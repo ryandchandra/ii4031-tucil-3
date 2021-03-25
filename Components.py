@@ -52,3 +52,8 @@ class SubjectFrame:
         
         self.n_key = tk.Label(master=self.frame,text="n: -")
         self.n_key.pack()
+    
+    def UpdateKey(self,e,d,n):
+        self.e_key["text"] = "e: " + str(e)
+        self.d_key["text"] = "d: " + str(d)
+        self.n_key["text"] = "n: " + str(n)

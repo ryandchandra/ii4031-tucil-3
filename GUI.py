@@ -9,7 +9,7 @@ from Components import *
 from FileHandlingWindow import *
 from GenerateKeyWindow import *
 
-from ModifiedRC4Lib import *
+from RSALib import *
 
 class GUI:
     def __init__(self,parent):
@@ -119,6 +119,7 @@ class GUI:
                 self.role_frame.button_list[1]["state"] = tk.NORMAL
                 self.Alice_frame.title_label["text"] = "Alice (You)"
                 self.Bob_frame.title_label["text"] = "Bob"
+                self.Bob_frame.d_key["text"] = "d: -"
             elif (sender=="Bob"):
                 self.sender = sender
                 self.receiver = "Alice"
@@ -126,6 +127,7 @@ class GUI:
                 self.role_frame.button_list[1]["state"] = tk.DISABLED
                 self.Alice_frame.title_label["text"] = "Alice"
                 self.Bob_frame.title_label["text"] = "Bob (You)"
+                self.Alice_frame.d_key["text"] = "d: -"
                 
             #------
             #
@@ -194,6 +196,8 @@ class GUI:
         return "break"
         
     def ChooseKeyFile(self,event,subject):
+        success = False
+    
         public_filename = fd.askopenfilename(
             initialdir = "/",
             title = "Select " + subject + " public key file",
@@ -208,8 +212,47 @@ class GUI:
             )
             
             if (private_filename!=""):
-                pass
+                success = True 
             
+        if (success):
+            public_file = open(public_filename,"r")
+            content_pub = public_file.read()
+            
+            e_pub = int(content_pub[0:(content_pub.find(' ')+1)])
+            n_pub = int(content_pub[(content_pub.find(' ')+1):])
+            
+            public_file.close()
+            
+            private_file = open(private_filename,"r")
+            content_pri = private_file.read()
+            
+            d_pri = int(content_pri[0:(content_pri.find(' ')+1)])
+            n_pri = int(content_pri[(content_pri.find(' '))+1:])
+            
+            private_file.close()
+            
+            if (n_pub==n_pri):
+                if (math.gcd(e_pub,d_pri)==1):
+                    if (subject=="Alice"):
+                        self.Alice_e = e_pub
+                        self.Alice_d = d_pri
+                        self.Alice_n = n_pub
+                        if (subject=="Alice"):
+                            self.Alice_frame.UpdateKey(e_pub,d_pri,n_pub)
+                        elif (subject=="Bob"):
+                            self.Alice_frame.UpdateKey(e_pub,"-",n_pub)
+                    elif (subject=="Bob"):
+                        self.Bob_e = e_pub
+                        self.Bob_d = d_pri
+                        self.Bob_n = n_pub
+                        if (subject=="Alice"):
+                            self.Bob_frame.UpdateKey(e_pub,"-",n_pub)
+                        elif (subject=="Bob"):
+                            self.Bob_frame.UpdateKey(e_pub,d_pri,n_pub)
+                else:
+                    self.AlertWindow("Sepertinya file key salah. Coba dicek lagi.")
+            else:
+                self.AlertWindow("Sepertinya file key salah. Coba dicek lagi.")
         return "break"
         
     def OpenFileText(self,event,text):
