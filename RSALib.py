@@ -60,7 +60,7 @@ def BlockByteIntArray(byteint_array,size):
 def BlockCiphertext(ciphertext,n):
     # Input : ciphertext panjang dalam digit hexadecimal
     # Output : array ciphertext per blok sesuai 32 log n
-    block_size = math,ceil(math.log(n,16))
+    block_size = math.ceil(math.log(n,16))
     ciphertext_string = str(ciphertext)
     
     ciphertext_block = []
