@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.scrolledtext as st
+import tkinter.filedialog as fd
 
 from GenerateKeyLib import *
 
@@ -56,17 +57,19 @@ class GenerateKeyWindow:
             # Save Key pair to file
             success = False
         
-            public_filename = fd.askopenfilename(
+            public_filename = fd.asksaveasfilename(
                 initialdir = "/",
-                title = "Select " + subject + " public key file",
-                filetypes = [("Public key files (.pub)","*.pub")]
+                title = "Save public key file",
+                filetypes = [("Public key files (.pub)","*.pub")],
+                defaultextension = [("Public key files (.pub)","*.pub")]
             )
             
             if (public_filename!=""):
-                private_filename = fd.askopenfilename(
+                private_filename = fd.asksaveasfilename(
                     initialdir = public_filename[0:(public_filename.rfind('/')+1)],
-                    title = "Select " + subject + " private key file",
-                    filetypes = [("Private key files (.pri)","*.pri")]
+                    title = "Save private key file",
+                    filetypes = [("Private key files (.pri)","*.pri")],
+                    defaultextension = [("Private key files (.pri)","*.pri")]
                 )
                 
                 if (private_filename!=""):
@@ -88,6 +91,10 @@ class GenerateKeyWindow:
                 private_file.write(str(n))
                 
                 private_file.close()
+                
+                self.AlertWindow("File saved to "+public_filename+" and "+private_filename)
+                
+                self.window.destroy()
         
         
     def RandomizeKey(self):
