@@ -3,6 +3,7 @@ import tkinter.scrolledtext as st
 
 class GenerateKeyWindow:
     def __init__(self,parent):
+        self.parent = parent
         self.window = tk.Toplevel(parent)
         self.window.title("Generate Key")
         
@@ -36,4 +37,36 @@ class GenerateKeyWindow:
     def RandomizeKey(self):
         # generate key
         # save ke file
+        return "break"
+    
+    def AlertWindow(self,text):
+        # Create new window for alert
+        # Components : label with input text and dismiss button
+        alert_window = tk.Toplevel(self.parent)
+        alert_window.title("Alert")
+        
+        tk.Label(master=alert_window,text=text).pack(padx=120,pady=20)
+        tk.Button(master=alert_window,text="OK",width=10,command=lambda:alert_window.destroy()).pack(pady=10)
+        
+        alert_window.grab_set()
+        
+    def ConfirmationWindow(self,text):
+        self.confirm_window = tk.Toplevel(self.parent)
+        self.confirm_window.title("Confirm")
+        
+        tk.Label(master=self.confirm_window,text=text).pack(padx=120,pady=20)
+        tk.Button(master=self.confirm_window,text="OK",width=10,command=lambda text="OK":self.Confirm(text)).pack(pady=10)
+        tk.Button(master=self.confirm_window,text="Cancel",width=10,command=lambda text="Cancel":self.Confirm(text)).pack(pady=10)
+        
+        self.confirm_window.grab_set()
+        
+    def Confirm(self,text):
+        if (text=="OK"):
+            # ganti nilai p q
+            self.p_entry.insert("1.0",1)
+            self.q_entry.insert("1.0",2)
+            self.confirm_window.destroy()
+        elif (text=="Cancel"):
+            self.confirm_window.destroy()
+            
         return "break"

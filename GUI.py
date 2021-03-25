@@ -201,8 +201,6 @@ class GUI:
         )
         
         if (public_filename!=""):
-            directory = public_filename.rfind('/')
-            
             private_filename = fd.askopenfilename(
                 initialdir = public_filename[0:(public_filename.rfind('/')+1)],
                 title = "Select " + subject + " private key file",
