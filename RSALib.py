@@ -28,6 +28,18 @@ def HexStringToByteIntArray(hexstring):
         
     return byteint_array
 
+def ByteIntArrayToHexString(byteint_array):
+    # Mengubah string heksadesimal menjadi array of integer(byte)
+    # Input : string hexadecimal
+    # Output : array of integer (byte) dari string
+    
+    hexstring = ""
+    for byte in byteint_array:
+        cipher_hex = str(hex(byte))[2:].upper()
+        hexstring = hexstring + cipher_hex
+
+    return hexstring
+
 def OpenFileAsByteIntArray(filename):
     # Membuka file dengan nama filename per byte lalu menyimpannya menjadi array of integer (byte)
     # Input : filename

@@ -121,6 +121,9 @@ class FileHandlingWindow:
             e = self.e_key_entry.get("1.0",tk.END)[:-1]
             d = self.d_key_entry.get("1.0",tk.END)[:-1]
             n = self.n_key_entry.get("1.0",tk.END)[:-1]
+            e = int(e)
+            d = int(d)
+            n = int(n)
             
             if (self.key==""):
                 self.AlertWindow("Please insert key")
@@ -131,7 +134,8 @@ class FileHandlingWindow:
                 # encrypt
                 size = 1
                 ciphertext_hexstr = RSAEncrypt(plaintext_byteintarray,e,n,size)
-                
+                ciphertext_byteintarray = HexStringToByteIntArray(ciphertext_hexstr)
+
                 # save
                 filename = fd.asksaveasfilename(
                     initialdir = "/",
@@ -159,17 +163,19 @@ class FileHandlingWindow:
             e = self.e_key_entry.get("1.0",tk.END)[:-1]
             d = self.d_key_entry.get("1.0",tk.END)[:-1]
             n = self.n_key_entry.get("1.0",tk.END)[:-1]
+            e = int(e)
+            d = int(d)
+            n = int(n)
 
             if (self.key==""):
                 self.AlertWindow("Please insert key")
             else:
                 # baca file per byte lalu simpan menjadi array of integer (byte)
                 ciphertext_byteintarray = OpenFileAsByteIntArray(self.file)
-                
-                key_byteintarray = StringToByteIntArray(key)
+                ciphertext_hexstr = ByteIntArrayToHexString(ciphertext_byteintarray)
                 
                 # decrypt
-                plaintext_byteintarray = ModifiedRC4Decrypt(ciphertext_byteintarray,key)
+                plaintext_byteintarray = RSADecrypt(ciphertext_hexstr,d,n)
 
                 # save
                 filename = fd.asksaveasfilename(

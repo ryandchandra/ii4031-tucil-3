@@ -5,15 +5,19 @@ from random import randint
 import tkinter.filedialog as fd
 from RSALib import *
 
-A = StringToByteIntArray('Aku Kamu Kita')
-B = BlockByteIntArray(A,2)
-print (A)
+A = StringToByteIntArray('Aku Kamu Dia')
+print(A)
+B = RSAEncrypt(A, 107, 253, 1)
 print (B)
 
-C = RSAEncrypt(A, 107, 253, 2)
+C = HexStringToByteIntArray(B)
 print (C)
 
-D = BlockCiphertext(C,253)
-print (D)
+D = ""
+for byte in C:
+    cipher_hex = str(hex(byte))[2:].upper()
+    D = D + cipher_hex
+print(D)
 
-    
+E = RSADecrypt(D,183,253) 
+print(E)
