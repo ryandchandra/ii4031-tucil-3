@@ -1,3 +1,5 @@
+import math
+
 def StringToByteIntArray(string):
     # Mengubah string menjadi array of integer (byte) sesuai dengan ascii/utf-8
     # Input : string
@@ -30,6 +32,49 @@ def OpenFileAsByteIntArray(filename):
     input_file.close()
         
     return byteint_array
+    
+def BlockByteIntArray(byteint_array,size):
+    if (size==1):
+        return byteint_array
+    else:
+        blocked_byteintarray = []
+        i = 0
+        while (i<len(byteint_array)):
+            block = ""
+            for j in range(size):
+                if ((i+j)<len(byteint_array)):
+                    if (byteint_array[i+j]<10):
+                        block += "00" + str(byteint_array[i+j])
+                    elif (byteint_array[i+j]<100):
+                        block += "0" + str(byteint_array[i+j])
+                    else:
+                        block += str(byteint_array[i+j])
+                else:
+                    block += str(ord('/0'))
+                
+            i = i + size
+            blocked_byteintarray.append(int(block))
+            
+        return blocked_byteintarray
+        
+def BlockCiphertext(ciphertext,n):
+    # Input : ciphertext panjang dalam digit hexadecimal
+    # Output : array ciphertext per blok sesuai 32 log n
+    block_size = math,ceil(math.log(n,16))
+    ciphertext_string = str(ciphertext)
+    
+    ciphertext_block = []
+    i = 0
+    while (i<len(ciphertext_block)):
+        block = ""
+        for j in range(block_size):
+            if ((i+j)<len(ciphertext_string)):
+                block += ciphertext_string[i+j]
+        
+        i = i + block_size
+        ciphertext_block.append(int(block,16))
+
+    return ciphertext_block
 
 def ModifiedKey(key):
     # Create Modified key in Stream Cipher
@@ -50,26 +95,6 @@ def ModifiedKey(key):
 
     return modified_key
 
-def ModifiedKSA(key):
-    # Create Modified KSA in Stream Cipher
-    # Input : key (string any length)
-    # Output : larik S teracak (numbers 0-255)
-
-    # Inisialisasi larik S
-    larik_S = []
-    for i in range(256):
-        larik_S.append(i)
-
-    # Pengacakan larik S
-    # Modifikasi: larik_S[i] --> larik_S[K[i]]
-    # Sehingga menghasilkan nilai j yang lebih acak
-    K = ModifiedKey(key)
-    j = 0
-    for i in range(256):
-        j = (j+larik_S[K[i]]+K[i])%256
-        larik_S[i], larik_S[j] = larik_S[j], larik_S[i]
-
-    return larik_S
 
 def PermutationEncrypt(byteintarray,block_length):
     # Melakukan permutasi lanjutan pada byteintarray
@@ -99,35 +124,7 @@ def PermutationEncrypt(byteintarray,block_length):
     
     return modified_byteintarray
     
-def PermutationDecrypt(byteintarray,block_length):
-    # Mengembalikan efek permutasi yang dilakukan pada byteintarray
-    # Langkah pengembalian :
-    # 1. Swap setiap pasangan 2 byte. Jika jumlah byte ganjil, byte terakhir dibiarkan
-    # 2. Membagi array hasil swap menjadi blok-blok dengan panjang blocklength, kemudian masing-masing blok dikurangi offset sesuai urutan blok
-    #    Misal : blok 1 dikurangi offset 1, blok 2 dikurangi offset 2, dst
-    # Input : byteintarray (array of byte yang sudah dipermutasi), block_length (panjang blok)
-    # Output : array of integer (byte) yang benar
-    
-    modified_byteintarray = byteintarray
-    array_length = len(byteintarray)
-    
-    # Lakukan swap untuk setiap pasangan 2 byte
-    i = 0
-    while (i<array_length):
-        if (i!=array_length-1):
-            modified_byteintarray[i], modified_byteintarray[i+1] = modified_byteintarray[i+1], modified_byteintarray[i]
-            i = i + 2
-        else:
-            i = i + 1
-    
-    # Kurangi offset sesuai nomor blok
-    for i in range(array_length):
-        offset = i//block_length + 1
-        modified_byteintarray[i] = (modified_byteintarray[i] - offset)%256
-    
-    return modified_byteintarray
-    
-def ModifiedRC4Encrypt(plaintext_byteintarray,key):
+def RSAEncrypt(plaintext_byteintarray,key):
     # Create Normal PRGA Encrypt in Stream Cipher
     # Input :   plaintext_byteintarray (byte in array)
     #           key (string any length)
@@ -155,7 +152,7 @@ def ModifiedRC4Encrypt(plaintext_byteintarray,key):
     
     return ciphertext_byteintarray
     
-def ModifiedRC4Decrypt(ciphertext_byteintarray,key):
+def RSADecrypt(ciphertext_byteintarray,key):
     # Create Normal PRGA Decrypt in Stream Cipher
     # Input :   ciphertext_byteintarray (byte in array)
     #           key (string any length)

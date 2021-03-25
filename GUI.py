@@ -142,12 +142,6 @@ class GUI:
                 self.Alice_frame.title_label["text"] = "Alice"
                 self.Bob_frame.title_label["text"] = "Bob (You)"
                 self.Alice_frame.d_key["text"] = "d: -"
-                
-            #------
-            #
-            # retrieve nilai e,d,n
-            #
-            #------
             
             self.encrypt_button["text"] = "Encrypt (as " + self.sender + ") and Send (to " + self.receiver + ")"
             self.decrypt_button["text"] = "Receive (from " + self.receiver +") and Decrypt (as " + self.sender +")"
@@ -158,13 +152,10 @@ class GUI:
         
         # Take the plaintext and key from the field
         plaintext = self.plaintext.entry.get("1.0",tk.END)[:-1]
-        key = self.keyframe.entry.get()
             
         # Check for validity
         if (len(plaintext)==0): # Empty plaintext
             self.AlertWindow("Please insert plaintext")
-        elif (len(key)==0): # Empty key
-            self.AlertWindow("Please insert key")
         else:
             plaintext_byteintarray = StringToByteIntArray(plaintext)
             key_byteintarray = StringToByteIntArray(key)
@@ -183,14 +174,11 @@ class GUI:
         # Decrypt ciphertext and key
         
         # Take the ciphertext and key from the field
-        key = self.keyframe.entry.get()
         ciphertext = self.ciphertext.entry.get("1.0",tk.END)[:-1]
 
         # Check for validity
         if (len(ciphertext)==0): # Empty ciphertext
             self.AlertWindow("Please insert ciphertext")
-        elif (len(key)==0): # Empty key
-            self.AlertWindow("Please insert key")
         else:
             ciphertext_byteintarray = StringToByteIntArray(ciphertext)
             key_byteintarray = StringToByteIntArray(key)
