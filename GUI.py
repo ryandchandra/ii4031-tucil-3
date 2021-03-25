@@ -125,6 +125,7 @@ class GUI:
         self.file_frame.frame.grid(row=2,column=2,rowspan=2)  
         
     def ChangeMode(self,event,role):
+        # Mengganti role dari Alice menjadi Bob atau sebaliknya
         if (self.role==role):
             pass
         else:
@@ -217,6 +218,7 @@ class GUI:
                 self.plaintext.entry.insert("1.0",plaintext)
         
     def GenerateKey(self,event):
+        # Membuka window baru untuk membuat key baru
         key_window = GenerateKeyWindow(self.parent)
         key_window.window.grab_set()
         

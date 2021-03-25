@@ -49,9 +49,6 @@ class GenerateKeyWindow:
         self.randomize_button_256 = tk.Button(master=self.window,text="Randomize Number (256 bit)",width=25,command=lambda size=256: self.RandomizeKey(size))
         self.randomize_button_256.grid(row=10,column=0,columnspan=2,padx=2,pady=2)
         
-        self.randomize_button_1024 = tk.Button(master=self.window,text="Randomize Number (1024 bit)",width=25,command=lambda size=1024: self.RandomizeKey(size))
-        self.randomize_button_1024.grid(row=11,column=0,columnspan=2,padx=2,pady=2)
-        
         self.alert = tk.Label(master=self.window,text="Large number may take a long time to process. Please wait a bit.")
         self.alert.grid(row=12,column=0,columnspan=2,padx=2,pady=2)
         
