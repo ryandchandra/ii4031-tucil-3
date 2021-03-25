@@ -28,11 +28,32 @@ class GenerateKeyWindow:
         self.q_entry = tk.Text(master=self.window,width=30,height=2)
         self.q_entry.grid(row=3,column=1,padx=2,pady=2)
         
-        self.generate_button = tk.Button(master=self.window,text="Generate Key",width=20,command=self.GenerateKey)
+        self.generate_button = tk.Button(master=self.window,text="Generate Key",width=25,command=self.GenerateKey)
         self.generate_button.grid(row=4,column=0,columnspan=2,padx=2,pady=2)
         
-        self.randomize_button = tk.Button(master=self.window,text="Randomize Key",width=20,command=self.RandomizeKey)
-        self.randomize_button.grid(row=5,column=0,columnspan=2,padx=2,pady=2)
+        self.randomize_button_8 = tk.Button(master=self.window,text="Randomize Number (8 bit)",width=25,command=lambda size=8: self.RandomizeKey(size))
+        self.randomize_button_8.grid(row=5,column=0,columnspan=2,padx=2,pady=2)
+        
+        self.randomize_button_16 = tk.Button(master=self.window,text="Randomize Number (16 bit)",width=25,command=lambda size=16: self.RandomizeKey(size))
+        self.randomize_button_16.grid(row=6,column=0,columnspan=2,padx=2,pady=2)
+        
+        self.randomize_button_32 = tk.Button(master=self.window,text="Randomize Number (32 bit)",width=25,command=lambda size=32: self.RandomizeKey(size))
+        self.randomize_button_32.grid(row=7,column=0,columnspan=2,padx=2,pady=2)
+        
+        self.randomize_button_64 = tk.Button(master=self.window,text="Randomize Number (64 bit)",width=25,command=lambda size=64: self.RandomizeKey(size))
+        self.randomize_button_64.grid(row=8,column=0,columnspan=2,padx=2,pady=2)
+        
+        self.randomize_button_128 = tk.Button(master=self.window,text="Randomize Number (128 bit)",width=25,command=lambda size=128: self.RandomizeKey(size))
+        self.randomize_button_128.grid(row=9,column=0,columnspan=2,padx=2,pady=2)
+        
+        self.randomize_button_256 = tk.Button(master=self.window,text="Randomize Number (256 bit)",width=25,command=lambda size=256: self.RandomizeKey(size))
+        self.randomize_button_256.grid(row=10,column=0,columnspan=2,padx=2,pady=2)
+        
+        self.randomize_button_1024 = tk.Button(master=self.window,text="Randomize Number (1024 bit)",width=25,command=lambda size=1024: self.RandomizeKey(size))
+        self.randomize_button_1024.grid(row=11,column=0,columnspan=2,padx=2,pady=2)
+        
+        self.alert = tk.Label(master=self.window,text="Large number may take a long time to process. Please wait a bit.")
+        self.alert.grid(row=12,column=0,columnspan=2,padx=2,pady=2)
         
     def GenerateKey(self):
         # Validation
@@ -97,55 +118,16 @@ class GenerateKeyWindow:
                 self.window.destroy()
         
         
-    def RandomizeKey(self):
+    def RandomizeKey(self,size):
         # generate key
-        out = RandomKey()
+        out = RandomKey(size)
         p = out[0]
         q = out[1]
-        e = out[2]
-        d = out[3]
-        n = out[4]
 
         self.p_entry.delete("1.0",tk.END)
         self.p_entry.insert("1.0",p)
         self.q_entry.delete("1.0",tk.END)
         self.q_entry.insert("1.0",q)
-
-        # save ke file
-        success = False
-    
-        public_filename = fd.askopenfilename(
-            initialdir = "/",
-            title = "Select " + subject + " public key file",
-            filetypes = [("Public key files (.pub)","*.pub")]
-        )
-        
-        if (public_filename!=""):
-            private_filename = fd.askopenfilename(
-                initialdir = public_filename[0:(public_filename.rfind('/')+1)],
-                title = "Select " + subject + " private key file",
-                filetypes = [("Private key files (.pri)","*.pri")]
-            )
-            
-            if (private_filename!=""):
-                success = True 
-        
-        if (success):
-            public_file = open(public_filename,"w")
-            
-            public_file.write(str(e))
-            public_file.write(" ")
-            public_file.write(str(n))
-            
-            public_file.close()
-            
-            private_file = open(private_filename,"w")
-            
-            private_file.write(str(d))
-            private_file.write(" ")
-            private_file.write(str(n))
-            
-            private_file.close()
     
     def AlertWindow(self,text):
         # Create new window for alert
