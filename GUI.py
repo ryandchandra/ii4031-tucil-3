@@ -66,7 +66,7 @@ class GUI:
         #--- plaintext ---#
         self.plaintext = TextFrame(
             title="Plaintext",
-            width=50,
+            width=60,
             height=5
         )
         self.plaintext.frame.grid(row=1,column=0,columnspan=2)
@@ -84,12 +84,26 @@ class GUI:
         #self.decrypt_button.grid(row=2,column=1,padx=10,pady=10)
         self.decrypt_button.pack(padx=2,pady=2)
         
-        self.button_frame.grid(row=2,column=0,columnspan=2)
+        self.button_frame.grid(row=2,column=0)
+        
+        #--- block size frame ---#
+        self.block_size_frame = tk.Frame()
+        
+        self.block_size_label = tk.Label(master=self.block_size_frame,text="Block size (in bytes)")
+        self.block_size_label.pack()
+        
+        self.block_size_entry = tk.Entry(master=self.block_size_frame)
+        self.block_size_entry.pack()
+        
+        self.block_size_alert = tk.Label(master=self.block_size_frame,text="less than n in bytes")
+        self.block_size_alert.pack()
+        
+        self.block_size_frame.grid(row=2,column=1)
         
         #--- ciphertext ---#
         self.ciphertext = TextFrame(
             title="Ciphertext",
-            width=50,
+            width=60,
             height=5
         )
         self.ciphertext.frame.grid(row=3,column=0,columnspan=2)
