@@ -37,20 +37,8 @@ class GenerateKeyWindow:
         self.randomize_button_16 = tk.Button(master=self.window,text="Randomize Number (16 bit)",width=25,command=lambda size=16: self.RandomizeKey(size))
         self.randomize_button_16.grid(row=6,column=0,columnspan=2,padx=2,pady=2)
         
-        self.randomize_button_32 = tk.Button(master=self.window,text="Randomize Number (32 bit)",width=25,command=lambda size=32: self.RandomizeKey(size))
-        self.randomize_button_32.grid(row=7,column=0,columnspan=2,padx=2,pady=2)
-        
-        self.randomize_button_64 = tk.Button(master=self.window,text="Randomize Number (64 bit)",width=25,command=lambda size=64: self.RandomizeKey(size))
-        self.randomize_button_64.grid(row=8,column=0,columnspan=2,padx=2,pady=2)
-        
-        self.randomize_button_128 = tk.Button(master=self.window,text="Randomize Number (128 bit)",width=25,command=lambda size=128: self.RandomizeKey(size))
-        self.randomize_button_128.grid(row=9,column=0,columnspan=2,padx=2,pady=2)
-        
-        self.randomize_button_256 = tk.Button(master=self.window,text="Randomize Number (256 bit)",width=25,command=lambda size=256: self.RandomizeKey(size))
-        self.randomize_button_256.grid(row=10,column=0,columnspan=2,padx=2,pady=2)
-        
         self.alert = tk.Label(master=self.window,text="Large number may take a long time to process. Please wait a bit.")
-        self.alert.grid(row=12,column=0,columnspan=2,padx=2,pady=2)
+        self.alert.grid(row=9,column=0,columnspan=2,padx=2,pady=2)
         
     def GenerateKey(self):
         # Validation
