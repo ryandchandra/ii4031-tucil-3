@@ -64,6 +64,18 @@ def GenerateKey(p, q):
     arr = [e, d, n]
     return arr
 
+def RandomKey():
+    # Generate random p, q, n, e, and d for RSA (key)
+    # Input :  -
+    # Output :  array (p, q, e, d, n) 
 
+    p = randint (2, 1000)
+    p = ValidationPrime(p)
+    q = p 
+    while (q == p):
+        q = randint (2, 1000)
+        q = ValidationPrime(q)
     
-    
+    arr = GenerateKey(p, q)
+    out = [p, q, arr[0], arr[1], arr[2]]
+    return out  

@@ -44,14 +44,28 @@ class GenerateKeyWindow:
 
         # Generate key
         arr = GenerateKey(p, q)
+        e = arr[0]
+        d = arr[1]
+        n = arr[2]
+
+        # Save Key pair to file
         
-        # save ke file
-        #return "break"
         
     def RandomizeKey(self):
         # generate key
+        out = RandomKey()
+        p = out[0]
+        q = out[1]
+        e = out[2]
+        d = out[3]
+        n = out[4]
+
+        self.p_entry.delete("1.0",tk.END)
+        self.p_entry.insert("1.0",p)
+        self.q_entry.delete("1.0",tk.END)
+        self.q_entry.insert("1.0",q)
+
         # save ke file
-        return "break"
     
     def AlertWindow(self,text):
         # Create new window for alert

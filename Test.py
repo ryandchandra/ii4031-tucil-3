@@ -37,3 +37,5 @@ arr = [e, d, n]
 print (arr)
 A = arr[0]
 print (A)
+B = [p, q, arr[0], arr[1], arr[2]]
+print (B)
