@@ -60,12 +60,12 @@ def BlockByteIntArray(byteint_array,size):
 def BlockCiphertext(ciphertext,n):
     # Input : ciphertext panjang dalam digit hexadecimal
     # Output : array ciphertext per blok sesuai 32 log n
-    block_size = math,ceil(math.log(n,16))
+    block_size = math.ceil(math.log(n,16))
     ciphertext_string = str(ciphertext)
     
     ciphertext_block = []
     i = 0
-    while (i<len(ciphertext_block)):
+    while (i<len(ciphertext_string)):
         block = ""
         for j in range(block_size):
             if ((i+j)<len(ciphertext_string)):
@@ -89,7 +89,7 @@ def RSAEncrypt(plaintext_byteintarray,e,n,size):
     ciphertext_hexstr = ""
     for block in plaintext_blocks:
         cipher_block = (block**e)%n
-        cipher_hex = str(hex(cipher_block))[2:]
+        cipher_hex = str(hex(cipher_block))[2:].upper()
         if (len(cipher_hex)<ciphertext_blocksize):
             leading_zero = "0" * (ciphertext_blocksize-len(cipher_hex))
             cipher_hex = leading_zero + cipher_hex
@@ -104,11 +104,11 @@ def RSADecrypt(ciphertext_hexstr,d,n):
     #           key (d,n)
     # Output :  plaintext (byte in array)
 
-    ciphertext_blocks = BlockCiphertext(ciphertext_hexstr)
+    ciphertext_blocks = BlockCiphertext(ciphertext_hexstr,n)
     
-    plaintext = ""
+    plaintext_byteintarray = []
     for block in ciphertext_blocks:
-        plaintext_block = (int(block,16)**d)%n
+        plaintext_block = (block**d)%n
         plaintext_blockstr = str(plaintext_block)
         if (len(plaintext_blockstr)%3!=0):
             leading_zero = "0" * (3-len(plaintext_blockstr)%3)
@@ -117,7 +117,7 @@ def RSADecrypt(ciphertext_hexstr,d,n):
         i = 0
         while (i<len(plaintext_blockstr)):
             num = plaintext_blockstr[i:i+3]
-            plaintext += chr(int(num))
+            plaintext_byteintarray.append(int(num))
             i = i + 3
             
-    return plaintext
+    return plaintext_byteintarray

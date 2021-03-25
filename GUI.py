@@ -17,9 +17,8 @@ class GUI:
         self.parent = parent
         self.parent.title("Kriptografi RSA")
         
-        #--- mode ---#
-        self.sender = "Alice"
-        self.receiver = "Bob"
+        #--- role ---#
+        self.role = "Alice"
         
         #--- define grid ---#
         self.parent.columnconfigure([0,1,2],weight=1)
@@ -29,14 +28,14 @@ class GUI:
         self.Alice_e = -1
         self.Alice_d = -1
         self.Alice_n = -1
-        self.Alice_frame = SubjectFrame(self.sender + " (You)")
+        self.Alice_frame = SubjectFrame("Alice (You)")
         self.Alice_frame.frame.grid(row=0,column=0)
         
         #--- Bob frame ---#
         self.Bob_e = -1
         self.Bob_d = -1
         self.Bob_n = -1
-        self.Bob_frame = SubjectFrame(self.receiver)
+        self.Bob_frame = SubjectFrame("Bob")
         self.Bob_frame.frame.grid(row=0,column=1)
         
         #--- role frame ---#
@@ -46,8 +45,8 @@ class GUI:
             labels = role_list,
             width = 25
         )
-        self.role_frame.button_list[0].bind("<Button-1>",lambda event,sender="Alice": self.ChangeMode(event,sender))
-        self.role_frame.button_list[1].bind("<Button-1>",lambda event,sender="Bob": self.ChangeMode(event,sender))
+        self.role_frame.button_list[0].bind("<Button-1>",lambda event,role="Alice": self.ChangeMode(event,role))
+        self.role_frame.button_list[1].bind("<Button-1>",lambda event,role="Bob": self.ChangeMode(event,role))
         self.role_frame.button_list[0]["state"] = tk.DISABLED
         self.role_frame.frame.grid(row=0,column=2);
         
@@ -75,12 +74,12 @@ class GUI:
         self.button_frame = tk.Frame()
         
         #--- encrypt button ---#
-        self.encrypt_button = tk.Button(master=self.button_frame,text="Encrypt (as " + self.sender + ") and Send (to " + self.receiver + ")",command=self.Encrypt,width=32)
+        self.encrypt_button = tk.Button(master=self.button_frame,text="Encrypt (as Alice) and Send (to Bob)",command=self.Encrypt,width=32)
         self.encrypt_button.pack(padx=2,pady=2)
         #self.encrypt_button.grid(row=2,column=0,padx=10,pady=10)
 
         #--- decrypt button ---#
-        self.decrypt_button = tk.Button(master=self.button_frame,text="Receive (from " + self.receiver +") and Decrypt (as " + self.sender +")",command=self.Decrypt,width=32)
+        self.decrypt_button = tk.Button(master=self.button_frame,text="Receive (from Bob) and Decrypt (as Alice)",command=self.Decrypt,width=32)
         #self.decrypt_button.grid(row=2,column=1,padx=10,pady=10)
         self.decrypt_button.pack(padx=2,pady=2)
         
@@ -97,6 +96,9 @@ class GUI:
         
         self.block_size_alert = tk.Label(master=self.block_size_frame,text="less than n in bytes")
         self.block_size_alert.pack()
+        
+        self.block_size_info = tk.Label(master=self.block_size_frame,text="default : 1")
+        self.block_size_info.pack()
         
         self.block_size_frame.grid(row=2,column=1)
         
@@ -122,52 +124,68 @@ class GUI:
         self.file_frame.button_list[4].bind("<Button-1>",self.EncryptDecryptFileWindow)
         self.file_frame.frame.grid(row=2,column=2,rowspan=2)  
         
-    def ChangeMode(self,event,sender):
-        if (self.sender==sender):
+    def ChangeMode(self,event,role):
+        if (self.role==role):
             pass
         else:
-            if (sender=="Alice"):
-                self.sender = sender
-                self.receiver = "Bob"
+            if (role=="Alice"):
+                self.role = role
                 self.role_frame.button_list[0]["state"] = tk.DISABLED
                 self.role_frame.button_list[1]["state"] = tk.NORMAL
                 self.Alice_frame.title_label["text"] = "Alice (You)"
                 self.Bob_frame.title_label["text"] = "Bob"
                 self.Bob_frame.d_key["text"] = "d: -"
-            elif (sender=="Bob"):
-                self.sender = sender
-                self.receiver = "Alice"
+                self.Alice_frame.d_key["text"] = "d: " + str(self.Alice_d)
+                self.encrypt_button["text"] = "Encrypt (as Alice) and Send (to Bob)"
+                self.decrypt_button["text"] = "Receive (from Bob) and Decrypt (as Alice)"
+            elif (role=="Bob"):
+                self.role = role
                 self.role_frame.button_list[0]["state"] = tk.NORMAL
                 self.role_frame.button_list[1]["state"] = tk.DISABLED
                 self.Alice_frame.title_label["text"] = "Alice"
                 self.Bob_frame.title_label["text"] = "Bob (You)"
                 self.Alice_frame.d_key["text"] = "d: -"
-            
-            self.encrypt_button["text"] = "Encrypt (as " + self.sender + ") and Send (to " + self.receiver + ")"
-            self.decrypt_button["text"] = "Receive (from " + self.receiver +") and Decrypt (as " + self.sender +")"
-        
+                self.Bob_frame.d_key["text"] = "d: " + str(self.Bob_d)
+                self.encrypt_button["text"] = "Encrypt (as Bob) and Send (to Alice)"
+                self.decrypt_button["text"] = "Receive (from Alice) and Decrypt (as Bob)"
+                
     def Encrypt(self):
         # Event handler when encrypt button is pressed
         # Encrypt plaintext and key
         
         # Take the plaintext and key from the field
         plaintext = self.plaintext.entry.get("1.0",tk.END)[:-1]
+        block_size = self.block_size_entry.get()
             
         # Check for validity
         if (len(plaintext)==0): # Empty plaintext
             self.AlertWindow("Please insert plaintext")
         else:
             plaintext_byteintarray = StringToByteIntArray(plaintext)
-            key_byteintarray = StringToByteIntArray(key)
-            
+                
             # Encrypt
-            ciphertext_byteintarray = ModifiedRC4Encrypt(plaintext_byteintarray,key)
-            ciphertext = bytes(ciphertext_byteintarray)
-            
-            # Insert into ciphertext field
-            self.ciphertext.entry.delete("1.0",tk.END)
-            self.ciphertext.entry.insert("1.0",ciphertext)
-
+            if (self.role=="Alice"):
+                e = self.Bob_e
+                n = self.Bob_n
+            elif (self.role=="Bob"):
+                e = self.Alice_e
+                n = self.Alice_n
+                    
+            if (e==-1 or n==-1):
+                self.AlertWindow("Please choose key first")
+            else:
+                if (len(block_size)==0):
+                    block_size = 1
+                elif (int(block_size)<math.log(n,16)):
+                    self.AlertWindow("Block size is too big. Please choose block size less than n")
+                else:
+                    block_size = int(block_size)
+                    
+                ciphertext_hexstr = RSAEncrypt(plaintext_byteintarray,e,n,block_size)
+                
+                # Insert into ciphertext field
+                self.ciphertext.entry.delete("1.0",tk.END)
+                self.ciphertext.entry.insert("1.0",ciphertext_hexstr)
             
     def Decrypt(self):
         # Event handler when decrypt button is pressed
@@ -180,16 +198,23 @@ class GUI:
         if (len(ciphertext)==0): # Empty ciphertext
             self.AlertWindow("Please insert ciphertext")
         else:
-            ciphertext_byteintarray = StringToByteIntArray(ciphertext)
-            key_byteintarray = StringToByteIntArray(key)
+            if (self.role=="Alice"):
+                d = self.Alice_d
+                n = self.Alice_n
+            elif (self.role=="Bob"):
+                d = self.Bob_d
+                n = self.Bob_n
             
-            # Decrypt
-            plaintext_byteintarray = ModifiedRC4Decrypt(ciphertext_byteintarray,key)
-            plaintext = bytes(plaintext_byteintarray)
-            
-            # Insert into plaintext field
-            self.plaintext.entry.delete("1.0",tk.END)
-            self.plaintext.entry.insert("1.0",plaintext)
+            if (d==-1 or n==-1):
+                self.AlertWindow("Please choose key for "+self.role)
+            else:            
+                # Decrypt
+                plaintext_byteintarray = RSADecrypt(ciphertext,d,n)
+                plaintext = bytes(plaintext_byteintarray)
+                
+                # Insert into plaintext field
+                self.plaintext.entry.delete("1.0",tk.END)
+                self.plaintext.entry.insert("1.0",plaintext)
         
     def GenerateKey(self,event):
         key_window = GenerateKeyWindow(self.parent)
@@ -239,17 +264,17 @@ class GUI:
                         self.Alice_e = e_pub
                         self.Alice_d = d_pri
                         self.Alice_n = n_pub
-                        if (subject=="Alice"):
+                        if (self.role=="Alice"):
                             self.Alice_frame.UpdateKey(e_pub,d_pri,n_pub)
-                        elif (subject=="Bob"):
+                        elif (self.role=="Bob"):
                             self.Alice_frame.UpdateKey(e_pub,"-",n_pub)
                     elif (subject=="Bob"):
                         self.Bob_e = e_pub
                         self.Bob_d = d_pri
                         self.Bob_n = n_pub
-                        if (subject=="Alice"):
+                        if (self.role=="Alice"):
                             self.Bob_frame.UpdateKey(e_pub,"-",n_pub)
-                        elif (subject=="Bob"):
+                        elif (self.role=="Bob"):
                             self.Bob_frame.UpdateKey(e_pub,d_pri,n_pub)
                 else:
                     self.AlertWindow("Sepertinya file key salah. Coba dicek lagi.")
