@@ -43,7 +43,7 @@ def ValidationPrime (num):
 def GenerateKey(p, q):
     # Generate Key e and d for RSA
     # Input :   p and q (prime numbers)
-    # Output :  (e, n) and (d, n) --> key pair public-private
+    # Output :  array (e, d, n) --> key pair public-private-n
 
     n = p*q
     toitent_euler = (p-1)*(q-1)
@@ -59,8 +59,10 @@ def GenerateKey(p, q):
         if ((e*int(d))%toitent_euler == 1):
             found = 1    
         k = k+1
+    d = int(d)
 
-    return "break"
+    arr = [e, d, n]
+    return arr
 
 
     

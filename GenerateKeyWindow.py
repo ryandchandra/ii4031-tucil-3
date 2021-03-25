@@ -42,7 +42,9 @@ class GenerateKeyWindow:
         self.q_entry.delete("1.0",tk.END)
         self.q_entry.insert("1.0",q)
 
-        # generate key
+        # Generate key
+        arr = GenerateKey(p, q)
+        
         # save ke file
         #return "break"
         

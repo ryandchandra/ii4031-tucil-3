@@ -30,5 +30,10 @@ while not(found):
     if ((e*int(d))%toitent_euler == 1):
         found = 1    
     k = k+1
-
+d = int(d)
 print(d)
+
+arr = [e, d, n]
+print (arr)
+A = arr[0]
+print (A)
