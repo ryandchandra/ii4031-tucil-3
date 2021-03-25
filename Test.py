@@ -1,9 +1,10 @@
 # Test.py ini cuma buat aku ngecek2, nanti hapus aja filenya kalo udah final
 
 from GenerateKeyLib import *
+from random import randint
 
-p = 3556
-q = 752
+p = 36
+q = 64
 
 p = ValidationPrime(p)
 q = ValidationPrime(q)
@@ -11,18 +12,23 @@ q = ValidationPrime(q)
 print (p)
 print (q)
 
-def GenerateKey(self):
-        # Validation
-        p = int(self.p_entry.get("1.0",tk.END)[:-1])
-        q = int(self.q_entry.get("1.0",tk.END)[:-1])
 
-        p = ValidationPrime(p)
-        q = ValidationPrime(q)
-        self.p_entry.delete("1.0",tk.END)
-        self.p_entry.insert("1.0",p)
-        self.q_entry.delete("1.0",tk.END)
-        self.q_entry.insert("1.0",q)
+n = p*q
+toitent_euler = (p-1)*(q-1)
+e = toitent_euler
+while (e >= toitent_euler):
+    e = randint (2, toitent_euler)
+    e = ValidationPrime(e)
 
-        # generate key
-        # save ke file
-        #return "break"
+print (toitent_euler)
+print (e)
+
+found = 0
+k = 1
+while not(found):
+    d = (1+k*toitent_euler)/e
+    if ((e*int(d))%toitent_euler == 1):
+        found = 1    
+    k = k+1
+
+print(d)

@@ -1,3 +1,5 @@
+from random import randint
+
 def IsPrime (num):
     # Check a number, whether it's prime or not
     # Input :   num (int)
@@ -39,6 +41,25 @@ def ValidationPrime (num):
         return num_prime
 
 def GenerateKey(p, q):
+    # Generate Key e and d for RSA
+    # Input :   p and q (prime numbers)
+    # Output :  (e, n) and (d, n) --> key pair public-private
+
+    n = p*q
+    toitent_euler = (p-1)*(q-1)
+    e = toitent_euler
+    while (e >= toitent_euler):
+        e = randint (2, toitent_euler)
+        e = ValidationPrime(e)
+
+    found = 0
+    k = 1
+    while not(found):
+        d = (1+k*toitent_euler)/e
+        if ((e*int(d))%toitent_euler == 1):
+            found = 1    
+        k = k+1
+
     return "break"
 
 
