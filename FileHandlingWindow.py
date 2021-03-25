@@ -196,7 +196,6 @@ class FileHandlingWindow:
                 end_time = time.time()
                 elapsed_time = end_time - start_time
                 
-                print(plaintext_byteintarray)
                 #print(plaintext_byteintarray)
 
                 # save
